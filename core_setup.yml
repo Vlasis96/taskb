@@ -1,0 +1,52 @@
+---
+- hosts: databases
+  become: yes
+  tasks:
+    - name: install database packages
+      apt:
+        pkg:
+          - postgresql
+        update_cache: yes
+        cache_valid_time: 3600  
+
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: webservers packages
+      apt:
+        pkg:
+          - nginx
+          - php-fpm
+          - php-cgi 
+          - php 
+          - php-pgsql 
+          - php-mbstring 
+          - php-intl 
+          - php-redis 
+          - php-imagick 
+          - php-igbinary 
+          - php-gmp 
+          - php-bcmath 
+          - php-curl 
+          - php-gd 
+          - php-zip 
+          - php-imap 
+          - php-ldap 
+          - php-bz2 
+          - php-ssh2 
+          - php-phpseclib 
+          - php-dev 
+          - libsmbclient-dev 
+          - php-pear 
+        update_cache: yes
+        cache_valid_time: 3600  
+
+- hosts: proxyservers
+  become: yes
+  tasks:
+    - name: proxyservers packages
+      apt:
+        pkg:
+          - haproxy
+        update_cache: yes
+        cache_valid_time: 3600  

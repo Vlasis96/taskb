@@ -1,0 +1,16 @@
+---
+- hosts: db
+  vars:
+    - dbuser: "ocuser"
+    - dbpass: "ocpass"
+    - dbname: "ocdb"
+  become: yes
+  roles:
+    - postgres
+
+- hosts: ws
+  become: yes
+  roles:
+    - php
+    - nginx
+    - owncloud
