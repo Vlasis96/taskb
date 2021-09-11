@@ -1,0 +1,26 @@
+---
+# Μεταβλητές για τη βάση
+dbuser: "ocuser"
+dbpass: "ocpass"
+dbname: "ocdb"
+
+# Μεταβλητές για το πακέτο
+oc_package: "owncloud-complete-20210721.zip"
+oc_url: "https://download.owncloud.org/community/{{ oc_package }}"
+oc_hash: "https://download.owncloud.org/community/{{ oc_package }}.sha256"
+
+# Μεταβλητές για τον Apache
+apache_modules:
+  - rewrite
+  - headers
+  - env
+  - dir
+  - mime
+  - unique_id
+
+# Μεταβλητές για την εφαρμογή του OwnCloud
+app_admin: "admin"
+app_pass: "q1w2e3.."
+trusted_domains:
+  - "{{ inventory_hostname_short }}"
+  - "10.10.10.30"

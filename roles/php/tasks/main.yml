@@ -3,7 +3,6 @@
 - name: Εγκατάσταση php
   apt:
     pkg:
-      - php-fpm
       - php-cgi 
       - php 
       - php-pgsql 

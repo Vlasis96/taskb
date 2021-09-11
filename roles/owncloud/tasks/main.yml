@@ -1,3 +1,71 @@
 ---
 # tasks file for roles/owncloud
+- name: Εγκαθιστούμε βοηθητικά πακέτα
+  apt:
+    pkg:
+      - unzip
+      - acl
 
+- name: Κατεβάζουμε το OwnCloud
+  get_url:
+    url: "{{ oc_url }}"
+    checksum: "sha256:{{ oc_hash }}"
+    dest: /tmp/
+
+- name: Αποσυμπιέζουμε το συμπιεσμένο αρχείο του OwnCloud με τα σωστά δικαιώματα για τον Apache
+  unarchive:
+    src: "/tmp/{{ oc_package }}"
+    dest: /var/www/
+    remote_src: yes
+    creates: /var/www/owncloud
+    owner: www-data
+    group: www-data
+
+- name: Αντιγράφουμε τις ρυθμίσεις για να σερβίρει ο Apache το φάκελο του OwnCloud
+  copy:
+    src: owncloud.conf
+    dest: /etc/apache2/sites-available/
+
+- name: Ενεργοποιούμε την σελίδα του OwnCloud
+  file:
+    src: /etc/apache2/sites-available/owncloud.conf
+    dest: /etc/apache2/sites-enabled/owncloud.conf
+    state: link
+
+- name: Κάνουμε reload τον Apache2
+  systemd:
+    name: apache2
+    state: reloaded
+
+- name: Βρίσκουμε την IP της βάσης
+  setup:
+  delegate_to: "{{ groups['databases'][0] }}"
+  delegate_facts: true
+  register: dbfacts
+
+- name: Ελέγχουμε εάν έχει εγκατασταθεί ήδη το OwnCloud
+  shell: php occ status | grep installed | cut -c16-19
+  args:
+    chdir: /var/www/owncloud
+  register: occ_response
+  become: yes
+  become_user: www-data
+
+- name: Τρέχουμε την εντολή εγκατάστασης του OwnCloud
+  shell: php occ maintenance:install --database "pgsql" --database-host "{{ dbfacts.ansible_facts.ansible_default_ipv4.address }}" --database-name "{{ dbname }}" --database-user "{{ dbuser }}" --database-pass "{{ dbpass }}" --admin-user "{{ app_admin }}" --admin-pass "{{ app_pass }}"
+  args:
+    chdir: /var/www/owncloud
+  become: yes
+  become_user: www-data
+  when:
+    - occ_response.stdout != "true"
+
+- name: Ορίζουμε τα επιτρεπόμενα domain που θα απαντάει το OwnCloud
+  shell: php occ config:system:set trusted_domains {{ idx }} --value={{ item }}
+  args:
+    chdir: /var/www/owncloud
+  loop: "{{ trusted_domains }}"
+  loop_control:
+    index_var: idx
+  become: yes
+  become_user: www-data
