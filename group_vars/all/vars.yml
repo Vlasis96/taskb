@@ -17,6 +17,7 @@ apache_modules:
   - dir
   - mime
   - unique_id
+  - ssl
 
 # Μεταβλητές για την εφαρμογή του OwnCloud
 app_admin: "admin"
@@ -24,3 +25,4 @@ app_pass: "q1w2e3.."
 trusted_domains:
   - "{{ inventory_hostname_short }}"
   - "10.10.10.30"
+  - "hua-met.duckdns.org"

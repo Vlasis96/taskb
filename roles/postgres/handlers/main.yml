@@ -1,6 +1,0 @@
----
-# handlers file for roles/postgres
-- name: Restart postgresql
-  systemd:
-    name: postgresql
-    state: restarted

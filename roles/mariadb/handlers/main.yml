@@ -1,0 +1,6 @@
+---
+# handlers file for roles/mariadb
+- name: Restart mariadb
+  systemd:
+    name: mariadb
+    state: restarted

@@ -3,6 +3,3 @@ db
 
 [webservers]
 ws
-
-[proxyservers]
-ha

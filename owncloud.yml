@@ -2,7 +2,7 @@
 - hosts: db
   become: yes
   roles:
-    - postgres
+    - mariadb
 
 - hosts: ws
   become: yes

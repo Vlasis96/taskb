@@ -5,6 +5,8 @@
     pkg:
       - unzip
       - acl
+    update_cache: yes
+    cache_valid_time: 3600  
 
 - name: Κατεβάζουμε το OwnCloud
   get_url:
@@ -32,6 +34,12 @@
     dest: /etc/apache2/sites-enabled/owncloud.conf
     state: link
 
+- name: Ενεργοποιούμε το HTTPS στον Apache
+  file:
+    src: /etc/apache2/sites-available/default-ssl.conf
+    dest: /etc/apache2/sites-enabled/default-ssl.conf
+    state: link
+
 - name: Κάνουμε reload τον Apache2
   systemd:
     name: apache2
@@ -52,7 +60,7 @@
   become_user: www-data
 
 - name: Τρέχουμε την εντολή εγκατάστασης του OwnCloud
-  shell: php occ maintenance:install --database "pgsql" --database-host "{{ dbfacts.ansible_facts.ansible_default_ipv4.address }}" --database-name "{{ dbname }}" --database-user "{{ dbuser }}" --database-pass "{{ dbpass }}" --admin-user "{{ app_admin }}" --admin-pass "{{ app_pass }}"
+  shell: php occ maintenance:install --database "mysql" --database-host "{{ dbfacts.ansible_facts.ansible_default_ipv4.address }}" --database-name "{{ dbname }}" --database-user "{{ dbuser }}" --database-pass "{{ dbpass }}" --admin-user "{{ app_admin }}" --admin-pass "{{ app_pass }}"
   args:
     chdir: /var/www/owncloud
   become: yes

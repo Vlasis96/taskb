@@ -4,6 +4,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "db" do |db|
     db.vm.box = "debian/bullseye64"
     db.vm.hostname = "db"
+    db.vm.synced_folder ".", "/vagrant", type: "rsync"
     db.vm.network :forwarded_port, guest: 22, host: 2201, protocol: "tcp"
     db.vm.provider :libvirt do |libvirt|
       libvirt.storage_pool_name = "default"
@@ -20,18 +21,7 @@ Vagrant.configure("2") do |config|
     ws.vm.provider :libvirt do |libvirt|
       libvirt.storage_pool_name = "default"
       libvirt.cpus = 2
-      libvirt.memory = 1024
+      libvirt.memory = 2048
     end
   end
-#  config.vm.define "ha" do |ha|
-#    ha.vm.box = "debian/bullseye64"
-#    ha.vm.hostname = "ha"
-#    ha.vm.network :forwarded_port, guest: 22, host: 2203, protocol: "tcp"
-#    ha.vm.network :forwarded_port, guest: 80, host: 80, protocol: "tcp", host_ip: "0.0.0.0"
-#    ha.vm.network :forwarded_port, guest: 443, host: 443, protocol: "tcp", host_ip: "0.0.0.0"
-#    ha.vm.provider :libvirt do |libvirt|
-#      libvirt.storage_pool_name = "default"
-#      libvirt.memory = 1024
-#    end
-#  end
 end

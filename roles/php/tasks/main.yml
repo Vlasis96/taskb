@@ -5,7 +5,7 @@
     pkg:
       - php-cgi 
       - php 
-      - php-pgsql 
+      - php-mysql
       - php-mbstring 
       - php-intl 
       - php-redis 

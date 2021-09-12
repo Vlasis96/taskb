@@ -1,0 +1,33 @@
+---
+# tasks file for roles/mariadb
+- name: Εγκατάσταση βάσης MariaDB
+  apt:
+    pkg:
+      - mariadb-server-10.5
+      - python3-pymysql
+      - acl
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Ορίζουμε την διεργασία της MariaDB να ακούει σε όλες τις IP του host
+  replace:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    replace: "bind-address            = 0.0.0.0"
+    regexp: "bind-address            = 127.0.0.1"
+  notify:
+    - Restart mariadb
+
+- name: Δημιουργούμε βάση
+  mysql_db:
+    name: "{{ dbname }}"
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+- name: Δημιουργούμε χρήστη στη βαση
+  mysql_user:
+    name: "{{ dbuser }}"
+    password:  "{{ dbpass }}"
+    host: "%"
+    state: present
+    priv: "{{ dbname }}.*:ALL"
+    login_unix_socket: /run/mysqld/mysqld.sock
