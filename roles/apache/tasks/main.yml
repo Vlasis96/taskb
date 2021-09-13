@@ -11,6 +11,7 @@
     name: "{{ item }}"
     state: present
   loop: "{{ apache_modules }}"
+  when: apache_modules is defined
   notify:
     - Restart apache2
 

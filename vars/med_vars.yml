@@ -1,0 +1,9 @@
+---
+# Μεταβλητές για τη βάση
+dbuser: "med"
+dbpass: "MrSjtu7t"
+dbname: "med"
+
+# Μεταβλητές για τον Apache
+apache_modules:
+  - ssl

@@ -2,15 +2,15 @@
 - hosts: db
   become: yes
   vars_files:
-    - vars/oc_vars.yml
+    - vars/med_vars.yml
   roles:
     - mariadb
 
 - hosts: ws
   become: yes
   vars_files:
-    - vars/oc_vars.yml
+    - vars/med_vars.yml
   roles:
     - php
     - apache
-    - owncloud
+    - med

@@ -1,0 +1,71 @@
+---
+# tasks file for roles/med
+- name: Εγκαθιστούμε βοηθητικά πακέτα
+  apt:
+    pkg:
+      - unzip
+      - acl
+    update_cache: yes
+    cache_valid_time: 3600 
+
+- name: Ενεργοποιούμε το HTTPS στον Apache
+  file:
+    src: /etc/apache2/sites-available/default-ssl.conf
+    dest: /etc/apache2/sites-enabled/default-ssl.conf
+    state: link
+
+- name: Αντικαθιστούμε το 000-default.conf με το δικό μας που περιέχει και HTTPS redirection
+  copy:
+    src: 000-default.conf
+    dest: /etc/apache2/sites-available/000-default.conf
+
+- name: Αφαιρούμε το default index.html αρχειο
+  file:
+    path: /var/www/html/index.html
+    state: absent
+
+- name: Προσθέτουμε ServerName στο configuration του default-ssl site
+  lineinfile:
+    path: /etc/apache2/sites-available/default-ssl.conf
+    line: '                ServerName hua-met.duckdns.org'
+    insertafter: 'ServerAdmin webmaster@localhost$'
+    firstmatch: yes
+
+- name: Αντιγράφουμε τα αρχεία της εφαρμογής μας
+  copy:
+    src: med/
+    dest: /var/www/html/
+    owner: www-data
+    group: www-data
+
+- name: Βρίσκουμε την IP της βάσης
+  setup:
+  delegate_to: "{{ groups['databases'][0] }}"
+  delegate_facts: true
+  register: dbfacts
+
+- name: Αντιγράφουμε το σχήμα της βάσης στο database host μας
+  copy:
+    src: med.sql
+    dest: /tmp/
+  delegate_to: "{{ groups['databases'][0] }}"
+
+- name: Κάνουμε εισαγωγή το σχήμα της βάσης στο database host μας
+  mysql_db:
+    name: med
+    target: /tmp/med.sql
+    state: import
+    login_unix_socket: /run/mysqld/mysqld.sock
+  delegate_to: "{{ groups['databases'][0] }}"
+
+- name: Αντιγράφουμε το template config.php
+  template:
+    src: config.php.j2
+    dest: /var/www/html/config.php
+    owner: www-data
+    group: www-data
+
+- name: Κάνουμε reload τον Apache2
+  systemd:
+    name: apache2
+    state: reloaded
